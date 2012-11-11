@@ -91,3 +91,20 @@ log4j = {
            'org.hibernate',
            'net.sf.ehcache.hibernate'
 }
+
+
+oauth {
+        providers {
+            slc {
+               api = graphviz.oauth.SLCApi
+               key = 'app-key-goes-here'
+               secret = 'app-secret-goes-here'
+	       callback = 'https://127.0.0.1:8443/graphviz/oauth/slc/callback'
+	       successUri = 'https://127.0.0.1:8443/graphviz/slc/api'
+	       failureUri = 'https://127.0.0.1:8443/graphviz/slc/'
+	    }
+       }
+       debug = true
+       connectTimeout = 30000
+       receiveTimeout = 30000
+}
