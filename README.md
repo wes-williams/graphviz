@@ -1,4 +1,4 @@
-Want to see my resume? grails run-app
+Want to see my resume? grails run-app -https
 
 Otherwise, you may be interested in navigating your own dataset or API.
 The javascript is not dependent on the grails portion.
