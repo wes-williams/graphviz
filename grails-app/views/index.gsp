@@ -39,6 +39,7 @@
 document.location.hash='#loadingDialog';
 
 // control data
+var dataSource = '${params.ds==null?'resume':params.ds}';
 var crumbs = [];
 var selectables = [];
 var dataIndex = new Object();

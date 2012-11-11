@@ -97,10 +97,10 @@ oauth {
         providers {
             slc {
                api = graphviz.oauth.SLCApi
-               key = 'app-key-goes-here'
-               secret = 'app-secret-goes-here'
+               key = 'api-key-goes-here'
+               secret = 'api-secret-goes-here'
 	       callback = 'https://127.0.0.1:8443/graphviz/oauth/slc/callback'
-	       successUri = 'https://127.0.0.1:8443/graphviz/slc/api'
+	       successUri = 'https://127.0.0.1:8443/graphviz/?ds=slc'
 	       failureUri = 'https://127.0.0.1:8443/graphviz/slc/'
 	    }
        }
