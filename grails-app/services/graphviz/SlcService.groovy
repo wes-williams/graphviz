@@ -41,6 +41,62 @@ class SlcService {
       def response = oauthService."${verb}SlcResource"(accessToken,url)
 
       JSON.parse(response.body)
+    } 
+    
+    def extractContent(data) {
+      
+      def content = extractContent(data,null).toString()
+      content = content.replaceAll("<br /><br /><br />","<br />")
+      content = content.replaceAll("<br /><br />","<br />")
+      content = content.replaceAll("<hr /><hr />","<hr />")
+      
+      return "<div style='width:420px;height:300px;overflow:scroll;white-space:nowrap;'>${content}</div>"
+    }
+    
+    def extractContent(data,contentIn) {
+        
+      StringBuilder content = contentIn!=null?contentIn:new StringBuilder()
+     
+       if(data instanceof List) {
+
+         if(data.size() > 0 ) {
+           data.each { 
+             extractContent(it,content)  
+           }
+         }
+       }
+       else if(data instanceof Map) {
+         data.each { k , v ->
+           if(k != "links") {
+             if(!(v instanceof List<Map> && v.size() == 0)) {      
+               if(v instanceof Map || v instanceof List) {
+                 content.append("<hr />")
+                 content.append("<b>${k.capitalize().replaceAll(/([A-Z][a-z]*)/, '$1 ').trim().toUpperCase()}:</b> ")
+                 content.append("<hr /><i>")
+               }
+               else {
+                 if(k==k.toUpperCase()) {
+                   content.append("<b>${k}:</b> ")
+                 }
+                 else {
+                   content.append("<b>${k.capitalize().replaceAll(/([A-Z][a-z]*)/, '$1 ').trim()}:</b> ")
+                 }
+               }
+               extractContent(v,content)
+               content.append("<br />")
+               if(v instanceof Map || v instanceof List) {
+                 content.append("</i><hr />")
+               }
+             } 
+           } 
+         }
+       }
+       else if(data!=null) {
+         content.append(data)
+         content.append("<br />")
+       }
+       
+       return content
     }
     
     def lookupData(searchId) {
@@ -115,8 +171,8 @@ class SlcService {
         
         schoolView['label'] = school.educationOrgIdentificationCode[0].ID
         schoolView['title'] = school.educationOrgIdentificationCode[0].ID
-	    schoolView['summary'] = ''
-	    schoolView['content'] = ''
+	    schoolView['summary'] = "SLC Identity # ${school.id}"
+	    schoolView['content'] = extractContent(school)
 	    schoolView['imageUrl'] = null
 	    schoolView['relations'] = getLinks.collect { (it.rel - 'get') + '_' + (schoolView.id - SCHOOL_KEY_PREFIX)  }
 
