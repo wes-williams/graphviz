@@ -6,7 +6,7 @@
 //                             "classpath:${appName}-config.groovy",
 //                             "file:${userHome}/.grails/${appName}-config.properties",
 //                             "file:${userHome}/.grails/${appName}-config.groovy"]
-grails.config.locations = [ "classpath:json/Resume.js" ]
+grails.config.locations = [ "classpath:json/*.js" ]
 
 
 // if (System.properties["${appName}.config.location"]) {
@@ -97,8 +97,8 @@ oauth {
         providers {
             slc {
                api = graphviz.oauth.SLCApi
-               key = 'api-key-goes-here'
-               secret = 'api-secret-goes-here'
+               key = 'app-key-goes-here'
+               secret = 'app-secret-goes-here'
 	       callback = 'https://127.0.0.1:8443/graphviz/oauth/slc/callback'
 	       successUri = 'https://127.0.0.1:8443/graphviz/?ds=slc'
 	       failureUri = 'https://127.0.0.1:8443/graphviz/slc/'
