@@ -135,7 +135,7 @@ class SlcService {
 	  slcView['imageUrl'] = null
 	  
 	  def slcData = call('get', slcResources.link )
-	  slcData.links.each { println it.rel }
+	  slcData.links.each { println it.rel + " = " + it.href }
 	  def slcLinks = slcData['links'].findAll { it.rel =~ /^get.+/ && resourceMappings.containsKey(it.rel - 'get') }
 		 
 	  slcView['relations'] = slcLinks.collect { 'All' + it.rel - 'get' }
@@ -170,6 +170,7 @@ class SlcService {
          // need to know later if params exists
          def paramsPresent = false
          if(args.size()>0) {
+	 println "params present for ${entityName} : ${args}"
            paramsPresent = true
          }
          
@@ -218,6 +219,12 @@ class SlcService {
 			 }
 			 else {
 			   allLinks=data['links'].findAll { it.rel =~ /^get.+/ && resourceMappings.containsKey(it.rel - 'get') }
+		     }
+                        
+                     // not going to show groups with no links
+		     if(entityName.startsWith('All') && allLinks.size()==0) {
+		       println "Omitting all groups ${entityName} with no relations"
+                       return 
 		     }
 		     
 		     // determine the unique entity relation types
@@ -319,7 +326,7 @@ class SlcService {
        else { 
          def view = [:]
          
-         view['id'] = entityName + '_' + args.join('_')
+         view['id'] = entityName + (args.size()==0?'':('_' + args.join('_')))
          // All groups need prefix
          // NOTE: should never fail to find these...
          if(isAllGroup) {

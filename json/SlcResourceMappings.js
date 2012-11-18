@@ -68,6 +68,28 @@
 	    'groupImageUrl' : 'null',
 	    'imageUrl' : 'null',
 	    'relationParams' : 'data.id'
+      }, 
+
+     'DisciplineActions' : {
+        'allLink' : '/disciplineActions?limit=5',
+        'link' : '/disciplineActions/%s?limit=5',
+        'label' : 'data.disciplineActionIdentifier',
+        'title' : 'data.disciplineActionIdentifier',
+	    'summary' : '"SLC Identity # ${data.id}"',
+	    'groupImageUrl' : 'null',
+	    'imageUrl' : 'null',
+	    'relationParams' : 'data.id'
+      }, 
+
+     'DisciplineIncidents' : {
+        'allLink' : '/disciplineIncidents?limit=5',
+        'link' : '/disciplineIncidents/%s?limit=5',
+        'label' : 'data.incidentIdentifier',
+        'title' : 'data.incidentIdentifier',
+	    'summary' : '"SLC Identity # ${data.id}"',
+	    'groupImageUrl' : 'null',
+	    'imageUrl' : 'null',
+	    'relationParams' : 'data.id'
       } 
   }
    
