@@ -9,7 +9,7 @@ class SlcController {
     def index() { } // enables login page
 	
 	def api = {
-
+println 'controller : ' + params.id
 	   if(params.callback==null) {
 		   render slcService.lookupData(params.id) as JSON
 	   }

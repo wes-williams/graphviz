@@ -10,6 +10,7 @@ import graphviz.oauth.OAuth20ServiceBearerAdapter
 class SlcService {
 
     final String API_BASE_URL = 'https://api.sandbox.slcedu.org/api/rest/v1'
+    final boolean DEBUG=false
     
     OauthService oauthService
     Map resourceMappings = null
@@ -117,42 +118,52 @@ class SlcService {
 	  return view
     }
     
+    
     // the center of everything
     def findSLC() {
     
       // TODO - need to make this method user centric
       // base impl on user's role
       // use session check?
-      
+      def slcResources = resourceMappings['SLC']
       def slcView = [:]  
       slcView['id'] = 'slc'
-      slcView['label'] = 'SLC'
+      slcView['label'] = 'My SLC'
       slcView['title'] = 'Shared Learning Collaborative'
 	  slcView['summary'] = ''
 	  slcView['content'] = ''
 	  slcView['imageUrl'] = null
-	  slcView['relations'] = find_Schools().collect { it.id }
+	  
+	  def slcData = call('get', slcResources.link )
+	  slcData.links.each { println it.rel }
+	  def slcLinks = slcData['links'].findAll { it.rel =~ /^get.+/ && resourceMappings.containsKey(it.rel - 'get') }
+		 
+	  slcView['relations'] = slcLinks.collect { 'All' + it.rel - 'get' }
 	    
 	  return slcView
-    }
+    } 
         
     // provide a generic impl for all known entities
     // provide a blank impl for all non-implemented entities
     def methodMissing(String name, args) {
-      
-       // process any method call starting with find
-       if(name =~ /^find.+/) {
-          
+
+     // process any method call starting with find
+     if(name =~ /^find.+/) {
+     if(DEBUG) println "calling " + name + " with " + args
          def entityName = name - 'find'
+           
+         // an entity starting with and Underscore implies called internally
+         def isInternal = false
+         if(entityName.startsWith('_')) { // internal method
+           entityName -= '_'
+           isInternal = true
+         }
          
-         // an entity starting wiht 'All' implies a grouping
+         // an entity starting with 'All' implies a grouping
          def isAllGroup = false
          if(entityName =~ /^All.+/) {
            isAllGroup = true
            entityName -= 'All'
-         }
-         else if(entityName.startsWith('_')) { // internal method
-           entityName -= '_'
          }
          
          // need to know later if params exists
@@ -171,12 +182,17 @@ class SlcService {
            // may cause problems. depending on urls... wait and see...
            if(!paramsPresent) {
              args=[]
-	         mapping.link.count('%s').times { args.add('') }
+            if(isInternal || isAllGroup) {
+              mapping.allLink.count('%s').times { args.add('') }
+            }
+            else {
+	          mapping.link.count('%s').times { args.add('') }
+	        }
 	       }
 	       
 	       // retrieve data from slc
-           def allData = call('get',String.format(mapping.link,*args))
-
+           def allData = call('get',String.format(isAllGroup?mapping.allLink:mapping.link,*args))
+       
            // wrap single element in List
            // NOTE: assume no params = expect multiple/list
 	       if(!(allData instanceof List)) {
@@ -187,8 +203,8 @@ class SlcService {
 	       allData.each { data ->
 	       
 	         // no sense in processing what already errored out
-	         if(data.containsKey('error')) {
-	           println 'omitting data because of error'
+	         if(entityName != 'SLC' && data.containsKey('error') || !data.containsKey('id')) {
+	           println name + args + 'omitting data because of error with data: ' + data
 	           return
 	         }
 	         
@@ -206,18 +222,18 @@ class SlcService {
 		     // determine the unique entity relation types
 		     def relationTypes = allLinks.collect { it.rel -'get' }.toSet() 
 		     
-		     // create group if 'All' entity
-		     if(isAllGroup) {
+		     // create group if not internal call and is 'All' entity
+		     if(!isInternal && isAllGroup) {
 		       view['id'] = 'All' + entityName +  (paramsPresent?'_'+args.join('_'):'')           
-			   view['label'] = entityName
-			   view['title'] = entityName
+			   view['label'] = entityNameWithSpaces
+			   view['title'] = entityNameWithSpaces
 			   view['summary'] = ''
 			   view['content'] = "This is a grouping of all ${entityName}"
 			   view['imageUrl'] = Eval.me('data',data,mapping.groupImageUrl)
 		     }
 		     else {
 		     
-	           view['id'] = entityName + '_' + (paramsPresent? args.join('_'):data.id)           
+	           view['id'] = entityName + '_' + ((!isInternal && paramsPresent)? args.join('_'):data.id)           
 			   view['label'] = Eval.me('data',data,mapping.label)
 			   view['title'] = Eval.me('data',data,mapping.title)
 			   view['summary'] = Eval.me('data',data,mapping.summary)
@@ -232,42 +248,96 @@ class SlcService {
 			   
 			   view['imageUrl'] = Eval.me('data',data,mapping.imageUrl)
 			 }  
-			  
-			 // multiple relations types should be grouped
-			 if(!isAllGroup && relationTypes.size()>1) { 
-			   view['relations'] = relationTypes.collect { 'All' + it + '_' + Eval.me('data',data,mapping.relationParams)  }			 
-			 }
-			 else { // otherwise, show the individual relations
-			   view['relations'] = allLinks.collect { (it.rel - 'get') + '_' + Eval.me('data',data,mapping.relationParams)  }
-			 }
 			 
-	         allViews.add(view)
-	       }
-	       
-	       if(!paramsPresent) {
-	         return allViews
-	       }
+			
+	        // infinite loop will occur from getting relations for relations...
+		    // BE CAREFUL when using internal!
+		    if(isInternal) {
+		      if(DEBUG) println "a " + name
+		      view['relations'] = []
+		    }
+			// multiple relations types should be grouped
+			// only group when not in a group
+			else if(!isAllGroup && relationTypes.size()>1) { 
+			   if(DEBUG) println "b " + name
+			   view['relations'] = relationTypes.collect { 'All' + it + '_' + Eval.me('data',data,mapping.relationParams)  }			 
+			}
+			else if(relationTypes.size()==1) {
+		      def relType = relationTypes.iterator().next()
+		      if(DEBUG) println "d - " + name + " : " + relType
+    	      def relationData = null // "find_All${relType}"(*args)
+		      if(relationData != null) {
+			     if(! (relationData instanceof List)) {
+			       relationData = [relationData]
+			     }
+			     // START TESTING
+			     if(DEBUG) relationData.each {println "d - " + name + " : " + relType + " :: " + it.id } //
+			     //view['relations']=[]
+			     // END TESTING
+			     view['relations'] = relationData.collect { it.id } 
+		       }
+		       else {
+		         view['relations'] = []
+		       }
+	        }
+		    else if(isAllGroup) {
+		      if(DEBUG) println "c - " + name
+		      def relationData = "find_All${entityName}"(*args)
+		      if(relationData != null) {
+			    if(! (relationData instanceof List)) {
+			      relationData = [relationData]
+			    }
+			    // START TESTING
+			    if(DEBUG) relationData.each { println  "c - " + name + " :: " + it.id }
+			    //view['relations']=[]
+			    // END TESTING
+			    view['relations'] = relationData.collect { it.id } 
+		      }
+		      else {
+		        view['relations'] = []
+		      }
+		    }
 	       else {
-	         return allViews[0] // risky...
+	         if(DEBUG) println "e"
+	         view['relations'] = []
 	       }
+       
+		   if(DEBUG) println name + " with " + args + " - relations " + view.relations	
+		   allViews.add(view)
+	     }
+	   }
 	       
+	   if(isInternal) {
+	     return allViews
+	   }
+	   else if(allViews.size()>0) {
+	     return allViews[0] 
+	   }
+       else { 
+         def view = [:]
+         
+         view['id'] = entityName + '_' + args.join('_')
+         // All groups need prefix
+         // NOTE: should never fail to find these...
+         if(isAllGroup) {
+           println "Failed to find an all group for ${entityName}!"
+           view['id'] = 'All' + view['id']
          }
-         else { 
-           def view = [:]
-           view['id'] = entityName + '_' + args.join('_')
-		   view['label'] = entityNameWithSpaces
-		   view['title'] = entityNameWithSpaces
-		   view['summary'] = 'TODO'
-		   view['content'] = 'Not implemented yet'
-		   view['imageUrl'] = null
-		   view['relations'] = []
+         
+		 view['label'] = entityNameWithSpaces
+		 view['title'] = entityNameWithSpaces
+		 view['summary'] = 'TODO'
+		 view['content'] = 'Not implemented yet'
+		 view['imageUrl'] = null
+		 view['relations'] = []
 		   
-		   println "missing " + view['id'] 
-		   return view
-	     }	  
-	   }    
+	    println "missing " + view['id'] 
+	    return view
+	   }	  
+	 }    
 
-       throw new MissingMethodException(name, delegate, args)
+     // there was no method impl found
+     throw new MissingMethodException(name, delegate, args)
    }
    
    // start collection of string utils
