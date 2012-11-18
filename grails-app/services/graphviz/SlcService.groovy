@@ -149,7 +149,8 @@ class SlcService {
 
      // process any method call starting with find
      if(name =~ /^find.+/) {
-     if(DEBUG) println "calling " + name + " with " + args
+         if(DEBUG) println "calling " + name + " with " + args
+         
          def entityName = name - 'find'
            
          // an entity starting with and Underscore implies called internally
