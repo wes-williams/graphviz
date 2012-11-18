@@ -262,10 +262,11 @@ class SlcService {
 			   if(DEBUG) println "b " + name
 			   view['relations'] = relationTypes.collect { 'All' + it + '_' + Eval.me('data',data,mapping.relationParams)  }			 
 			}
+			/*
 			else if(relationTypes.size()==1) {
 		      def relType = relationTypes.iterator().next()
 		      if(DEBUG) println "d - " + name + " : " + relType
-    	      def relationData = null // "find_All${relType}"(*args)
+    	      def relationData = "find_All${relType}"(*args)
 		      if(relationData != null) {
 			     if(! (relationData instanceof List)) {
 			       relationData = [relationData]
@@ -280,6 +281,7 @@ class SlcService {
 		         view['relations'] = []
 		       }
 	        }
+	        */
 		    else if(isAllGroup) {
 		      if(DEBUG) println "c - " + name
 		      def relationData = "find_All${entityName}"(*args)
