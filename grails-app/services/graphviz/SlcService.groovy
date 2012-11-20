@@ -99,23 +99,23 @@ class SlcService {
       view['title'] = 'N/A'
     }
 	  
-   if(!view.containsKey('summary') || view.summary==null || view.summary == '') {
-     view['summary'] = "Missing ID # ${searchId}"
-   }
+    if(!view.containsKey('summary') || view.summary==null || view.summary == '') {
+      view['summary'] = "Missing ID # ${searchId}"
+    }
 	  
-   if(!view.containsKey('content') || view.content==null || view.content == '') {
-     view['content'] = 'N/A'
-   }
+    if(!view.containsKey('content') || view.content==null || view.content == '') {
+      view['content'] = 'N/A'
+    }
 	  
-  if(!view.containsKey('imageUrl') || view.imageUrl==null || view.imageUrl=='') {
-    view['imageUrl'] = null
-  }
+    if(!view.containsKey('imageUrl') || view.imageUrl==null || view.imageUrl=='') {
+      view['imageUrl'] = null
+    }
 	  
-  if(!view.containsKey('relations') || view.relations==null) {
-    view['relations'] = []
-  }
+    if(!view.containsKey('relations') || view.relations==null) {
+      view['relations'] = []
+    }
 	  
-  return view
+    return view
   }
     
     
