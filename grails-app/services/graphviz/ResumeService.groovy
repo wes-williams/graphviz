@@ -4,22 +4,21 @@ import grails.converters.JSON
 
 class ResumeService {
 
-    static transactional = true
+  static transactional = true
 
-    def resume = null;
+  def resume = null;
 
-    public ResumeService() {
-      resume = JSON.parse(new File("json/Resume.js").text)
+  public ResumeService() {
+    resume = JSON.parse(new File("json/Resume.js").text)
+  }
+
+  def lookupData(searchId) {
+
+    if(searchId==null) {
+      searchId = 'me'
     }
 
-    def lookupData(searchId) {
-
-      if(searchId==null) {
-        searchId = 'me'
-      }
-
-      resume.find { it.id == searchId }
-    }
-
+    resume.find { it.id == searchId }
+  }
 }
 

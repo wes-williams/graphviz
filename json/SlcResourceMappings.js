@@ -1,7 +1,7 @@
 {
     
-      'SLC' :  {
-        'link' : '/home'          
+    'SLC' :  {
+       'link' : '/home'          
       },
       
     'Schools' :  {
@@ -9,10 +9,10 @@
         'link' : '/schools/%s',
         'label' : 'data.educationOrgIdentificationCode?.getAt(0)?.ID',
         'title' : 'data.educationOrgIdentificationCode?.getAt(0)?.ID',
-	    'summary' : '"SLC Identity # ${data.id}"',
-	    'groupImageUrl' : 'null',
-	    'imageUrl' : 'null',
-	    'relationParams' : 'data.id'          
+        'summary' : '"SLC Identity # ${data.id}"',
+        'groupImageUrl' : 'null',
+        'imageUrl' : 'null',
+        'relationParams' : 'data.id'          
       },
       
     'Courses' : {
@@ -20,10 +20,10 @@
         'link' : '/courses/%s',
         'label' : 'data.courseTitle',
         'title' : 'data.courseTitle',
-	    'summary' : '"SLC Identity # ${data.id}"',
-	    'groupImageUrl' : 'null',
-	    'imageUrl' : 'null',
-	    'relationParams' : 'data.id'           
+        'summary' : '"SLC Identity # ${data.id}"',
+        'groupImageUrl' : 'null',
+        'imageUrl' : 'null',
+        'relationParams' : 'data.id'           
       },
       
     'Students' : {
@@ -31,21 +31,21 @@
         'link' : '/students/%s',
         'label' : '"${data.name?.firstName} ${data.name?.lastSurname}"',
         'title' : '"${data.name?.firstName} ${data.name?.lastSurname}"',
-	    'summary' : '"SLC Identity # ${data.id}"',
-	    'groupImageUrl' : 'null',
-	    'imageUrl' : 'null',
-	    'relationParams' : 'data.id'     
+        'summary' : '"SLC Identity # ${data.id}"',
+        'groupImageUrl' : 'null',
+        'imageUrl' : 'null',
+        'relationParams' : 'data.id'     
       },
           
-    'Teachers' : {
+     'Teachers' : {
         'allLink' : '/schools/%s/teacherSchoolAssociations/teachers?limit=5',
         'link' : '/teachers/%s',
         'label' : '"${data.name?.firstName} ${data.name?.lastSurname}"',
         'title' : '"${data.name?.firstName} ${data.name?.lastSurname}"',
-	    'summary' : '"SLC Identity # ${data.id}"',
-	    'groupImageUrl' : 'null',
-	    'imageUrl' : 'null',
-	    'relationParams' : 'data.id'
+        'summary' : '"SLC Identity # ${data.id}"',
+        'groupImageUrl' : 'null',
+        'imageUrl' : 'null',
+        'relationParams' : 'data.id'
       },
       
      '_TeacherSectionAssociations' : {
@@ -53,10 +53,10 @@
         'link' : '/teacherSectionAssociations/%s/sections?limit=5',
         'label' : 'data.uniqueSectionCode',
         'title' : 'data.uniqueSectionCode',
-	    'summary' : '"SLC Identity # ${data.id}"',
-	    'groupImageUrl' : 'null',
-	    'imageUrl' : 'null',
-	    'relationParams' : 'data.teacherId'
+        'summary' : '"SLC Identity # ${data.id}"',
+        'groupImageUrl' : 'null',
+        'imageUrl' : 'null',
+        'relationParams' : 'data.teacherId'
       },
       
      'Sections' : {
@@ -64,10 +64,10 @@
         'link' : '/sections/%s?limit=5',
         'label' : 'data.uniqueSectionCode',
         'title' : 'data.uniqueSectionCode',
-	    'summary' : '"SLC Identity # ${data.id}"',
-	    'groupImageUrl' : 'null',
-	    'imageUrl' : 'null',
-	    'relationParams' : 'data.id'
+        'summary' : '"SLC Identity # ${data.id}"',
+        'groupImageUrl' : 'null',
+        'imageUrl' : 'null',
+        'relationParams' : 'data.id'
       }, 
 
      'DisciplineActions' : {
@@ -75,10 +75,10 @@
         'link' : '/disciplineActions/%s?limit=5',
         'label' : 'data.disciplineActionIdentifier',
         'title' : 'data.disciplineActionIdentifier',
-	    'summary' : '"SLC Identity # ${data.id}"',
-	    'groupImageUrl' : 'null',
-	    'imageUrl' : 'null',
-	    'relationParams' : 'data.id'
+        'summary' : '"SLC Identity # ${data.id}"',
+        'groupImageUrl' : 'null',
+        'imageUrl' : 'null',
+        'relationParams' : 'data.id'
       }, 
 
      'DisciplineIncidents' : {
@@ -86,10 +86,9 @@
         'link' : '/disciplineIncidents/%s?limit=5',
         'label' : 'data.incidentIdentifier',
         'title' : 'data.incidentIdentifier',
-	    'summary' : '"SLC Identity # ${data.id}"',
-	    'groupImageUrl' : 'null',
-	    'imageUrl' : 'null',
-	    'relationParams' : 'data.id'
+        'summary' : '"SLC Identity # ${data.id}"',
+        'groupImageUrl' : 'null',
+        'imageUrl' : 'null',
+        'relationParams' : 'data.id'
       } 
   }
-   

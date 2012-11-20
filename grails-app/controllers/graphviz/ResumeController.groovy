@@ -4,21 +4,21 @@ import grails.converters.JSON;
 
 class ResumeController {
 
-    def resumeService
+  def resumeService
 
-    def api = {
+  def api = {
 
-       if(params.callback==null) {
-         render resumeService.lookupData(params.id) as JSON
-       }
-       else {
-         render (
-            text: "${params.callback}(${resumeService.lookupData(params.id) as JSON})",
-            contentType: "text/javascript",
-            encoding: "UTF-8"
-         )
-       }
+    if(params.callback==null) {
+      render resumeService.lookupData(params.id) as JSON
     }
+    else {
+      render (
+        text: "${params.callback}(${resumeService.lookupData(params.id) as JSON})",
+        contentType: "text/javascript",
+        encoding: "UTF-8"
+      )
+    }
+  }
 
 }
 
