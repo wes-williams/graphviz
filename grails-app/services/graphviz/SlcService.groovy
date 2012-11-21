@@ -28,7 +28,7 @@ class SlcService {
     HttpSession session = RequestContextHolder.currentRequestAttributes().getSession()
     session[key]
   }
-        
+
   // all rest calls must go through here
   def call(verb,url) {
     
@@ -71,7 +71,7 @@ class SlcService {
            
     def idParts = searchId.tokenize('_')
     def entityName = idParts[0]        // first token is entiry
-    def entityArgs = idParts.drop(1)   // everything is argument
+    def entityArgs = idParts.drop(1)   // everything else is argument
        
     // methodMissing will provide all the wanted find impls
     // cleanseView will make sure all values are populated
@@ -163,9 +163,15 @@ class SlcService {
          
       // an entity starting with 'All' implies a grouping
       def isAllGroup = false
+      def groupByEntity = null
       if(entityName =~ /^All.+/) {
         isAllGroup = true
         entityName -= 'All'
+
+        if(args.size()>1 && args[0] =~ /^by([A-Z][a-z]+){1,}/) {
+          groupByEntity = args[0] - 'by'
+	  args = args.drop(1)
+	}
       }
          
       // need to know later if params exists
@@ -185,16 +191,37 @@ class SlcService {
         // may cause problems. depending on urls... wait and see...
         if(!paramsPresent) {
           args=[]
+
+       /* // NOT SURE THIS MAKES SENSE ANYMORE WITH GROUP BY ENTITIES
           if(isInternal || isAllGroup) {
             mapping.allLink.count('%s').times { args.add('') }
           }
           else {
 	    mapping.link.count('%s').times { args.add('') }
 	  }
+       */
         }
 	       
         // retrieve data from slc
-        def allData = call('get',String.format(isAllGroup?mapping.allLink:mapping.link,*args))
+	def callLink = null
+	if(isAllGroup) {
+	  // check to see if mapping exist for this grouping
+	  if(groupByEntity!=null && mapping.containsKey("allLinkBy${groupByEntity}")) { 
+            callLink = mapping["allLinkBy${groupByEntity}"]
+	  }
+	  else {
+	    if(groupByEntity!=null) {
+	      println "Missing the allLinkBy${groupByEntity} for ${entityName}!" 
+	    }
+	    // use the default all link
+            callLink = mapping.allLink 
+	  }
+	}
+	else {
+	  // use the direct link
+          callLink = mapping.link
+	}
+        def allData = call('get',String.format(callLink,*args))
        
         // wrap single element in List
         // NOTE: assume no params = expect multiple/list
@@ -233,7 +260,14 @@ class SlcService {
 		     
           // create group if not internal call and is 'All' entity
           if(!isInternal && isAllGroup) {
-            view['id'] = 'All' + entityName +  (paramsPresent?'_'+args.join('_'):'')           
+            view['id'] = 'All' + entityName
+	    if(paramsPresent) {
+	      if(groupByEntity!=null) {
+	        view['id'] += "_by${groupByEntity}"
+	      }
+	    
+	      view['id'] += '_'+args.join('_')           
+	    }
             view['label'] = entityNameWithSpaces
             view['title'] = entityNameWithSpaces
             view['summary'] = ''
@@ -270,7 +304,7 @@ class SlcService {
           else if(!isAllGroup && relationTypes.size()>1) { 
             if(DEBUG) println "b " + name
 
-            view['relations'] = relationTypes.collect { 'All' + it + '_' + Eval.me('data',data,mapping.relationParams)  }			 
+            view['relations'] = relationTypes.collect { "All${it}_by${entityName}_" + Eval.me('data',data,mapping.relationParams)  }			 
           }
         /*
           else if(relationTypes.size()==1) {
@@ -333,7 +367,8 @@ class SlcService {
      }
      else { 
        def view = [:]
-         
+       
+    /*
        view['id'] = entityName + (args.size()==0?'':('_' + args.join('_')))
        // All groups need prefix
        // NOTE: should never fail to find these...
@@ -341,10 +376,25 @@ class SlcService {
           println "Failed to find an all group for ${entityName}!"
           view['id'] = 'All' + view['id']
         }
+    */
+       view['id'] = entityName 
+
+       if(paramsPresent) {
+          if(groupByEntity!=null) {
+	    view['id'] += "_by${groupByEntity}"
+	  }
+	    
+	  view['id'] += '_'+args.join('_')           
+        }
+
+       if(isAllGroup) {
+          println "Failed to find an all group for ${entityName}!"
+          view['id'] = 'All' + view['id']
+        }
         
         view['label'] = entityNameWithSpaces
         view['title'] = entityNameWithSpaces
-        view['summary'] = 'TODO'
+        view['summary'] = 'TODO: ' + view['id']
         view['content'] = 'Not implemented yet'
         view['imageUrl'] = null
         view['relations'] = []
