@@ -33,7 +33,7 @@ class StickyNoteService {
       view['summary'] = "Message last updated on ${new Date()}"
       view['content'] = 'Remember the food drive is today. Leave your donations at the front.<br /><br /> '
       view['content'] += 'Lunch: Meat Loaf with mashed potatoes and vegatables'
-      view['imageUrl'] = null
+      view['imageUrl'] = 'images/slc/StickyNote.png'
       view['relations'] = ["${STICKY_NOTE_PREFIX}${dummyTestId}_1","${STICKY_NOTE_PREFIX}${dummyTestId}_2"]
       return view
     }

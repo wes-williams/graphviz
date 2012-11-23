@@ -128,11 +128,11 @@ class SlcService {
     def slcResources = resourceMappings['SLC']
     def slcView = [:]  
     slcView['id'] = 'slc'
-    slcView['label'] = 'My SLC'
-    slcView['title'] = 'Shared Learning Collaborative'
-    slcView['summary'] = ''
-    slcView['content'] = ''
-    slcView['imageUrl'] = null
+    slcView['label'] = slcResources.label
+    slcView['title'] = slcResources.title
+    slcView['summary'] = slcResources.summary
+    slcView['content'] = slcResources.content
+    slcView['imageUrl'] = slcResources.imageUrl
 	  
     def slcData = call('get', slcResources.link )
     slcData.links.each { println it.rel + " = " + it.href }

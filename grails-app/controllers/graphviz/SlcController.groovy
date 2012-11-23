@@ -24,7 +24,12 @@ class SlcController {
 
       def stickyNoteList = stickyNoteService.lookupRelatedStickyNotes(slcData.id)
       if(stickyNoteList.size()>0) {
-        slcData.relations.addAll(stickyNoteList)
+        // want the sticky notes to be front and center 
+        // NOTE : only one note currently, so this may be silly impl if not more in future
+        def newRelations = []
+        newRelations.addAll(stickyNoteList)
+        newRelations.addAll(slcData.relations)
+        slcData.relations = newRelations
       }
     }
 

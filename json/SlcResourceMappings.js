@@ -1,7 +1,12 @@
 {
     
     'SLC' :  {
-       'link' : '/home'          
+       'link' : '/home',          
+        'label' : 'My SLC',
+        'title' : 'My Shared Learning Collaborative',
+        'summary' : '',
+        'content' : '',
+        'imageUrl' : 'images/slc/MySLC.png'
       },
       
     'Schools' :  {
@@ -10,7 +15,7 @@
         'label' : 'data.educationOrgIdentificationCode?.getAt(0)?.ID',
         'title' : 'data.educationOrgIdentificationCode?.getAt(0)?.ID',
         'summary' : '"SLC Identity # ${data.id}"',
-        'groupImageUrl' : 'null',
+        'groupImageUrl' : "'images/slc/AllSchools.png'",
         'imageUrl' : 'null',
         'relationParams' : 'data.id'          
       },
@@ -24,7 +29,7 @@
         'label' : 'data.courseTitle',
         'title' : 'data.courseTitle',
         'summary' : '"SLC Identity # ${data.id}"',
-        'groupImageUrl' : 'null',
+        'groupImageUrl' : "'images/slc/AllCourses.png'",
         'imageUrl' : 'null',
         'relationParams' : 'data.id'           
       },
@@ -41,7 +46,7 @@
         'label' : '"${data.name?.firstName} ${data.name?.lastSurname}"',
         'title' : '"${data.name?.firstName} ${data.name?.lastSurname}"',
         'summary' : '"SLC Identity # ${data.id}"',
-        'groupImageUrl' : 'null',
+        'groupImageUrl' : "'images/slc/AllStudents.png'",
         'imageUrl' : 'null',
         'relationParams' : 'data.id'     
       },
@@ -54,7 +59,7 @@
         'label' : '"${data.name?.firstName} ${data.name?.lastSurname}"',
         'title' : '"${data.name?.firstName} ${data.name?.lastSurname}"',
         'summary' : '"SLC Identity # ${data.id}"',
-        'groupImageUrl' : 'null',
+        'groupImageUrl' : "'images/slc/AllTeachers.png'",
         'imageUrl' : 'null',
         'relationParams' : 'data.id'
       },
@@ -67,7 +72,7 @@
         'label' : 'data.uniqueSectionCode',
         'title' : 'data.uniqueSectionCode',
         'summary' : '"SLC Identity # ${data.id}"',
-        'groupImageUrl' : 'null',
+        'groupImageUrl' : "'images/slc/AllSections.png'",
         'imageUrl' : 'null',
         'relationParams' : 'data.id'
       }, 
@@ -79,7 +84,7 @@
         'label' : 'data.disciplineActionIdentifier',
         'title' : 'data.disciplineActionIdentifier',
         'summary' : '"SLC Identity # ${data.id}"',
-        'groupImageUrl' : 'null',
+        'groupImageUrl' : "'images/slc/AllDisciplineActions.png'",
         'imageUrl' : 'null',
         'relationParams' : 'data.id'
       }, 
@@ -91,7 +96,7 @@
         'label' : 'data.incidentIdentifier',
         'title' : 'data.incidentIdentifier',
         'summary' : '"SLC Identity # ${data.id}"',
-        'groupImageUrl' : 'null',
+        'groupImageUrl' : "'images/slc/AllDisciplineIncidents.png'",
         'imageUrl' : 'null',
         'relationParams' : 'data.id'
       } 
