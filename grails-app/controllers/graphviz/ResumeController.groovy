@@ -6,6 +6,10 @@ class ResumeController {
 
   def resumeService
 
+  def index = {
+   redirect(uri : "/?ds=resume")
+  }
+
   def api = {
 
     if(params.callback==null) {
