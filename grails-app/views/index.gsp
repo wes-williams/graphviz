@@ -39,6 +39,7 @@
 document.location.hash='#loadingDialog';
 
 // control data
+var serverUrl = '${grailsApplication.config.grails.serverURL}';
 var dataSource = '${params.ds==null?'resume':params.ds}';
 var crumbs = [];
 var selectables = [];

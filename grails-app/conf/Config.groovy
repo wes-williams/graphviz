@@ -8,7 +8,6 @@
 //                             "file:${userHome}/.grails/${appName}-config.groovy"]
 grails.config.locations = [ "classpath:json/*.js" ]
 
-
 // if (System.properties["${appName}.config.location"]) {
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
@@ -61,13 +60,22 @@ grails.exceptionresolver.params.exclude = ['password']
 // configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
 grails.hibernate.cache.queries = false
 
+// slc config
+graphviz.slc.appKey = ""
+graphviz.slc.appSecret = ""
+
 environments {
     development {
         grails.logging.jul.usebridge = true
+        grails.serverURL = "https://127.0.0.1:8443/graphviz"
+	graphviz.slc.appKey = "app-key-goes-here"
+	graphviz.slc.appSecret = "app-secret-goes-here"
     }
     production {
         grails.logging.jul.usebridge = false
-        // TODO: grails.serverURL = "http://www.changeme.com"
+        grails.serverURL = "http://eduviz.herokuapp.com"
+	graphviz.slc.appKey = "app-key-goes-here"
+	graphviz.slc.appSecret = "app-secret-goes-here"
     }
 }
 
@@ -97,11 +105,11 @@ oauth {
         providers {
             slc {
                api = graphviz.oauth.SLCApi
-               key = 'app-key-goes-here'
-               secret = 'app-secret-goes-here'
-	       callback = 'https://127.0.0.1:8443/graphviz/oauth/slc/callback'
-	       successUri = 'https://127.0.0.1:8443/graphviz/?ds=slc'
-	       failureUri = 'https://127.0.0.1:8443/graphviz/slc/'
+               key = "${graphviz.slc.appKey}"
+               secret = "${graphviz.slc.appSecret}"
+	       callback = "${grails.serverURL}/oauth/slc/callback"
+	       successUri = "${grails.serverURL}/?ds=slc"
+	       failureUri = "${grails.serverURL}/slc/"
 	    }
        }
        debug = true
