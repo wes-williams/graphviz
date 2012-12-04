@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>HTML5 Canvas!</title>
+    <title>EduViz!</title>
     <link rel="stylesheet" type="text/css" href="css/graph.css" />
     <script type="text/javascript" src="js/remoteData.js"></script>
     <script type="text/javascript" src="js/graph.js"></script>
@@ -15,7 +15,7 @@
        <div>
           <nav>
             <img id="image" src="" />
-						<ul id="relations">
+            <ul id="relations">
                 <a href="#"><li>relation</li></a>
             </ul>
           </nav>
@@ -32,15 +32,49 @@
           <h1 style="position:absolute;top:0;bottom:0;left:0;right:0;width:50%;height:40%;margin:auto;">Please Wait...<br /><br /><img src="images/nav/ajax-loader.gif" /></h1>
        </div>
    </div>
+   <div id="dataSourceDialog" class="divModalDialog">
+       <div style="position: relative">
+         <nav>
+          <h1 style="position:absolute;top:0;bottom:0;left:0;right:0;width:70%;height:50%;margin:auto;">Select a data source for EduViz:<br /><br />
+           <ul>
+	    <oauth:connect provider="slc"><li><h2>Shared Learning Collaborative</h2></li></oauth:connect>
+	    <!--<a href="./resume"><li><h2>Wes Williams' Resume</h2></li></a>-->
+	   </ul>
+	  </h1>
+	 </nav>
+       </div>
+   </div>
+    <div id="stickyNoteDialog" class="divModalDialog">
+       <div>
+         <span class="closeDialog"><a href="#">&nbsp;X&nbsp;</a></span>
+	 <br />
+	 <h1>Leave a Message</h1>
+	 <div  style="height:60%" align="center">
+	  <table>
+	    <tr><td>Title:</td><td align="left"><input type="text" name="title" maxlength="20" size="20" /></td></tr>
+            <tr><td>Summary:</td><td align="left"><input type="text" name="title" maxlength="50" size="50" /></td></tr>
+	    <tr><td valign="top">Message:</td><td><textarea name="note" cols="60" rows="10"></textarea></td></tr>
+	    <tr><td colspan="2" align="right"><input type="button" name="submit" value="Submit" /></td></tr>
+	  </table>
+	 </div>
+       </div>
+   </div>
+   <g:if test="${!'resume'.equals(params.ds)}">
+    <div align="center"><a style="color:white;text-decoration:none" href="./resume">Developed by Wes Williams</a></div>
+   </g:if>
+   <g:else>
+    <div align="center"><a style="color:white;text-decoration:none" href="#dataSourceDialog">Choose a Data Source</a></div>
+   </g:else>
   </body>
 </html>
 <script type="text/javascript">
 // make sure a refresh starts over
 document.location.hash='#loadingDialog';
 
+<g:if test="${params.ds!=null}">
 // control data
 var serverUrl = '${grailsApplication.config.grails.serverURL}';
-var dataSource = '${params.ds==null?'resume':params.ds}';
+var dataSource = '${params.ds}';
 var crumbs = [];
 var selectables = [];
 var dataIndex = new Object();
@@ -69,4 +103,8 @@ if(screen.availHeight<graphCanvas.height) { // || screen.availWidth<(graphCanvas
 
 // get started
 showData();
+</g:if>
+<g:else>
+document.location.hash='#dataSourceDialog';
+</g:else>
 </script>

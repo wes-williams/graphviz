@@ -363,7 +363,12 @@ class SlcService {
        return allViews
      }
      else if(allViews.size()>0) {
-       return allViews[0] 
+       def aView = allViews[0]
+       // only adding sticky note link when single entity 
+       if(!isAllGroup) {
+         addStickyNoteLink(aView)
+       }
+       return aView 
      }
      else { 
        def view = [:]
@@ -406,6 +411,11 @@ class SlcService {
 
     // there was no method impl found
     throw new MissingMethodException(name, delegate, args)
+  }
+
+  def addStickyNoteLink(view) {
+    // TODO : decouple from ui - custom view for slc?
+    view.title = "<span style='float:left'><a href='#stickyNoteDialog'><img style='max-height:50px;max-width:50px' src='images/slc/StickyNote.png' /></a></span>" + view.title
   }
    
   // start collection of string utils
