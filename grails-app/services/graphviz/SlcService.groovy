@@ -137,8 +137,31 @@ class SlcService {
     def slcData = call('get', slcResources.link )
     slcData.links.each { println it.rel + " = " + it.href }
     def slcLinks = slcData['links'].findAll { it.rel =~ /^get.+/ && resourceMappings.containsKey(it.rel - 'get') }
+
+
+    // overwrite contents with self if exists
+    def selfLink = slcData.links.find { it.rel == 'self' }
+    def selfType =null
+    if(selfLink != null) {
+      if(DEBUG) println "MY LINK = " + selfLink
+
+      def relativeSelfLink = selfLink.href - API_BASE_URL
+
+      def selfData =call('get',relativeSelfLink) 
+
+      //
+      if(selfData != null) {
+        if(relativeSelfLink =~ /^\/teachers\/.+/) {
+          selfType = "Teachers_${selfData.id}"
+        }
+        if(DEBUG) println "MYSELF = " + selfData
+	slcView['summary'] = "SLC Identity # ${selfType}"
+        slcView['content'] = extractContent(selfData)
+      }
+    }
 		 
-    slcView['relations'] = slcLinks.collect { 'All' + it.rel - 'get' }
+    def filterType = selfType!=null?"_by${selfType}":""
+    slcView['relations'] = slcLinks.collect { 'All' + (it.rel - 'get') + filterType }
     
     return slcView
   } 
@@ -221,6 +244,7 @@ class SlcService {
 	  // use the direct link
           callLink = mapping.link
 	}
+	if(DEBUG) println "CALLING ${name} WITH LINK ${callLink}"
         def allData = call('get',String.format(callLink,*args))
        
         // wrap single element in List
@@ -415,7 +439,7 @@ class SlcService {
 
   def addStickyNoteLink(view) {
     // TODO : decouple from ui - custom view for slc?
-    view.title = "<span style='float:left'><a href='#stickyNoteDialog'><img style='max-height:50px;max-width:50px' src='images/slc/StickyNote.png' /></a></span>" + view.title
+    view.title = "<span style='float:left'><a href=\"javascript:addStickyNote('${view.id}')\"><img style='max-height:50px;max-width:50px' src='images/slc/StickyNote.png' /></a></span>" + view.title
   }
    
   // start collection of string utils

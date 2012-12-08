@@ -5,6 +5,7 @@
     <link rel="stylesheet" type="text/css" href="css/graph.css" />
     <script type="text/javascript" src="js/remoteData.js"></script>
     <script type="text/javascript" src="js/graph.js"></script>
+    <script type="text/javascript" src="js/stickyNote.js"></script>
   </head>
   <body>
     <div align="center">
@@ -50,12 +51,17 @@
 	 <br />
 	 <h1>Leave a Message</h1>
 	 <div  style="height:60%" align="center">
-	  <table>
-	    <tr><td>Title:</td><td align="left"><input type="text" name="title" maxlength="20" size="20" /></td></tr>
-            <tr><td>Summary:</td><td align="left"><input type="text" name="title" maxlength="50" size="50" /></td></tr>
-	    <tr><td valign="top">Message:</td><td><textarea name="note" cols="60" rows="10"></textarea></td></tr>
-	    <tr><td colspan="2" align="right"><input type="button" name="submit" value="Submit" /></td></tr>
-	  </table>
+	  <form id="stickyNoteForm" name="stickyNoteForm">
+	    <table>
+	      <tr><td>Title:</td><td align="left"><input type="text" id="noteTitle" name="noteTitle" maxlength="20" size="20" /></td></tr>
+              <tr><td>Summary:</td><td align="left"><input type="text" id="noteSummary" name="noteSummary" maxlength="50" size="50" /></td></tr>
+	      <tr><td valign="top">Message:</td><td><textarea id="noteMessage" name="noteMessage" cols="60" rows="10"></textarea></td></tr>
+	      <tr>
+	        <td><input type="hidden" id="noteId" name="noteId" value="" /></td>
+	        <td align="right"><input type="button" id="noteSubmit" name="noteSubmit" value="Submit" onClick="submitStickyNote()" /></td>
+	      </tr>
+	     </table>
+	  </form>
 	 </div>
        </div>
    </div>

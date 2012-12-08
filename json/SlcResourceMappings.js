@@ -68,6 +68,7 @@
         'allLink' : '/sections?limit=5',
         'allLinkBySchools' : '/schools/%s/sections?limit=5',
 	'allLinkByStudents' : '/students/%s/studentSectionAssociations/sections?limit=5',
+	'allLinkByTeachers' : '/teachers/%s/teacherSectionAssociations/sections?limit=5',
         'link' : '/sections/%s?limit=5',
         'label' : 'data.uniqueSectionCode',
         'title' : 'data.uniqueSectionCode',
@@ -79,6 +80,7 @@
 
      'DisciplineActions' : {
         'allLink' : '/disciplineActions?limit=5',
+        'allLinkByTeachers' : '/disciplineActions?staffId=%s&limit=5',
         'allLinkByStudents' : '/disciplineActions?studentId=%s&limit=5',
         'link' : '/disciplineActions/%s?limit=5',
         'label' : 'data.disciplineActionIdentifier',
@@ -91,6 +93,7 @@
 
      'DisciplineIncidents' : {
         'allLink' : '/disciplineIncidents?limit=5',
+        'allLinkByTeachers' : '/disciplineIncidents?staffId=%s&limit=5',
         'allLinkByStudents' : '/students/%s/studentDisciplineIncidentAssociations/disciplineIncidents?limit=5',
         'link' : '/disciplineIncidents/%s?limit=5',
         'label' : 'data.incidentIdentifier',
