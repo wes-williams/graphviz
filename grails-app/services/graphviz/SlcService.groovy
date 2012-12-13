@@ -72,6 +72,13 @@ class SlcService {
     def idParts = searchId.tokenize('_')
     def entityName = idParts[0]        // first token is entiry
     def entityArgs = idParts.drop(1)   // everything else is argument
+
+    // new slc ids have _id at the end of them... doh!
+    if(entityArgs.size() >= 2 && entityArgs.last() == "id") {
+     entityArgs.pop() // remove id
+     def realId = entityArgs.pop() // get realId
+     entityArgs.add("${realId}_id") // add it back with _id extension
+    }
        
     // methodMissing will provide all the wanted find impls
     // cleanseView will make sure all values are populated
