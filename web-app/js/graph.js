@@ -10,13 +10,17 @@ function getMaxNodesPerPage() {
  return 8;
 }
 
+function getMaxVisibleCrumbs() {
+ return 4;
+}
+
 function findXYOn(event, currentElement) {
   var totalOffsetX = 0;
   var totalOffsetY = 0;
   var graphCanvasY = 0;
-  do{
-      totalOffsetX += currentElement.offsetLeft;
-      totalOffsetY += currentElement.offsetTop;
+  do {
+    totalOffsetX += currentElement.offsetLeft;
+    totalOffsetY += currentElement.offsetTop;
   }
   while(currentElement = currentElement.offsetParent)
 
@@ -37,7 +41,7 @@ function findOnCrumbsCanvas(event){
 function goToCrumb(e) {
   var crumb = findCrumbAtXY(findOnCrumbsCanvas(e))
 
-  if(crumb==null) return;
+  if(crumb==null || crumbs.indexOf(crumb)==crumbs.length-1) return;
 
   removeCrumbsUntil(crumb);
   loadData(crumb,0,0,0,crumb.currentPage)
@@ -47,12 +51,36 @@ function addCrumb(crumb,img) {
   if(crumbs.indexOf(crumb)!=-1) return;
   
   crumbs.push(crumb);
+
+  // need to adjust if more crumbs than space to display them
+  if(crumbs.length>getMaxVisibleCrumbs()) {
+    crumbsContext.clearRect(0,0,crumbsCanvas.width,crumbsCanvas.height);
+    // redraw the latest crumbs
+    for(var i=crumbs.length-getMaxVisibleCrumbs();i<crumbs.length;i++) {
+      doAddCrumb(crumbs[i],crumbs[i].image); 
+    }
+  }
+  else {
+    doAddCrumb(crumb,img); 
+  }
+}
+
+function doAddCrumb(crumb,img) {
   crumb.crumbX = (crumbsCanvas.width-crumb.width)/2;
-  crumb.crumbY =  10 + (crumbs.length==1?0:crumbs[crumbs.length-2].crumbY+ crumbs[crumbs.length-2].height);
+
+  var crumbIndex = crumbs.indexOf(crumb)
+  if((crumbIndex==0 && crumbs.length<=getMaxVisibleCrumbs()) ||
+     (crumbIndex == crumbs.length-getMaxVisibleCrumbs())) {
+    crumb.crumbY=10;
+  }
+  else {
+    crumb.crumbY =  10 + crumbs[crumbIndex-1].crumbY + crumbs[crumbIndex-1].height;
+  }
   
   if(crumb.imageUrl==null) {
     drawTextAsImage(crumbsCanvas,crumbsContext,null,crumb.label,crumb.crumbX,crumb.crumbY,crumb.width,crumb.height);
-  } else {
+  } 
+  else {
     drawImage(crumbsCanvas,crumbsContext,img,null,crumb.crumbX,crumb.crumbY,crumbs.length);
   }
 }
@@ -61,9 +89,21 @@ function removeCrumbsUntil(crumb) {
 
   var borderWidth=2;
   var crumbIndex = crumbs.indexOf(crumb);
-  for(var i=crumbs.length-1;i>crumbIndex;i--) {
-    crumbsContext.clearRect(crumbs[i].crumbX-borderWidth,crumbs[i].crumbY-borderWidth,crumbsCanvas.width+(borderWidth*2),crumbsCanvas.height+(borderWidth*2));
-    crumbs.pop();
+
+  if(crumbs.length > getMaxVisibleCrumbs()) {
+    crumbs = crumbs.slice(0,crumbIndex);
+    crumbsContext.clearRect(0,0,crumbsCanvas.width,crumbsCanvas.height);
+
+    var firstCrumbIndex = crumbs.length>getMaxVisibleCrumbs()?crumbs.length-getMaxVisibleCrumbs():0;
+    for(var i=firstCrumbIndex;i<crumbs.length;i++) {
+      doAddCrumb(crumbs[i],crumbs[i].image);
+    }
+  }
+  else {
+    for(var i=crumbs.length-1;i>crumbIndex;i--) {
+      crumbsContext.clearRect(crumbs[i].crumbX-borderWidth,crumbs[i].crumbY-borderWidth,crumbsCanvas.width+(borderWidth*2),crumbsCanvas.height+(borderWidth*2));
+      crumbs.pop();
+    }
   }
 }
 
@@ -145,7 +185,8 @@ function doLoadData(aData,startX,startY,relativePosition,pageNum,textLabelOverri
       if(textLabelOverride){
         aData.textLabelOverride=true;
       } 
-    } else {
+    } 
+    else {
       aData.textLabelVisible=false;
       aData.textLabelOverride=false;
       drawImage(graphCanvas,graphContext,img,aData,startX,startY,relativePosition); 
@@ -197,7 +238,7 @@ function doLoadData(aData,startX,startY,relativePosition,pageNum,textLabelOverri
         continue;
       }
    
-			switch(r%getMaxNodesPerPage())
+      switch(r%getMaxNodesPerPage())
       {
          case 0:
            startPicY -= distBetweenNodes*(percentTurn+percentTurnPlus);
@@ -279,7 +320,7 @@ function showInformation(e) {
     loadData(crumbs[crumbs.length-1],0,0,0,crumbs[crumbs.length-1].currentPage);
   }
   else {
-   showInformationForData(findSelectableAtXY(clickXY));
+    showInformationForData(findSelectableAtXY(clickXY));
   }
 }
 
@@ -315,7 +356,8 @@ function findSelectableAtXY(clickXY) {
 
 function findCrumbAtXY(clickXY) {
 
-  for(var i=0;i<crumbs.length;i++) {
+  var firstCrumbIndex = crumbs.length>getMaxVisibleCrumbs()?crumbs.length-getMaxVisibleCrumbs():0;
+  for(var i=firstCrumbIndex;i<crumbs.length;i++) {
     if(clickXY.x >= crumbs[i].crumbX && 
       clickXY.x <= (crumbs[i].crumbX+crumbs[i].width) &&
       clickXY.y >= crumbs[i].crumbY && 
@@ -398,7 +440,7 @@ function doShowInformationForData(aData,ignoreTextLabel) {
 
   var relationContent = '';
   var startNav=aData.currentPage==undefined?0:((aData.currentPage-1)*getMaxNodesPerPage());
-  var endNav = aData.currentPage==undefined?aData.relations.length:(aData.currentPage*getMaxNodesPerPage());
+  var endNav = aData.currentPage==undefined?(aData.relations.length>getMaxNodesPerPage()?getMaxNodesPerPage():aData.relations.length):(aData.currentPage*getMaxNodesPerPage());
   for(var j=startNav;j<endNav &&j<aData.relations.length;j++) {
     
     if(isAtCenter) {
@@ -435,80 +477,80 @@ function doShowData(data) {
 
 function drawImage(canvas,context,img,aData,startX,startY,relativePosition) {
 
-    var canvasWidth = canvas.width;
-    var canvasHeight = canvas.height;
-    var imageWidth = img.width;
-    var imageHeight = img.height;
+   var canvasWidth = canvas.width;
+   var canvasHeight = canvas.height;
+   var imageWidth = img.width;
+   var imageHeight = img.height;
 
-    var forcedImageWidth=100;
-    var scalingAdjustment = imageWidth>forcedImageWidth?forcedImageWidth/imageWidth:1+((forcedImageWidth-imageWidth)/forcedImageWidth); 
+   var forcedImageWidth=100;
+   var scalingAdjustment = imageWidth>forcedImageWidth?forcedImageWidth/imageWidth:1+((forcedImageWidth-imageWidth)/forcedImageWidth); 
 
-    if(scalingAdjustment!=1) { 
-      imageWidth *= scalingAdjustment;
-      imageHeight *= scalingAdjustment;
-    }
+   if(scalingAdjustment!=1) { 
+     imageWidth *= scalingAdjustment;
+     imageHeight *= scalingAdjustment;
+   }
 
-    if(imageHeight>imageWidth) {
-      scalingAdjustment = imageWidth/imageHeight; 
+   if(imageHeight>imageWidth) {
+     scalingAdjustment = imageWidth/imageHeight; 
 
-      if(scalingAdjustment!=1) { 
-        imageWidth *= scalingAdjustment;
-        imageHeight *= scalingAdjustment;
-      }
-    }
+     if(scalingAdjustment!=1) { 
+       imageWidth *= scalingAdjustment;
+       imageHeight *= scalingAdjustment;
+     }
+   }
 
-    if(canvas == graphCanvas && relativePosition > 0) {
-      if(selectables[0].width != imageWidth) {
-        startX -= (imageWidth-selectables[0].width)/2;
-      }
+   if(canvas == graphCanvas && relativePosition > 0) {
+     if(selectables[0].width != imageWidth) {
+       startX -= (imageWidth-selectables[0].width)/2;
+     }
 
-      if(selectables[0].height != imageHeight) {
-          startY -= (imageHeight-selectables[0].height)/2;
-      }
-    }
+     if(selectables[0].height != imageHeight) {
+         startY -= (imageHeight-selectables[0].height)/2;
+     }
+   }
 
-    var startPicX = relativePosition!=0?startX:((canvasWidth/2)-(imageWidth/2));
-    var endPicX = startPicX + imageWidth;
-    var startPicY = relativePosition!=0?startY:((canvasHeight/2)-(imageHeight/2));
-    var endPicY = startPicY + imageHeight;
-    var borderWidth = 2;
+   var startPicX = relativePosition!=0?startX:((canvasWidth/2)-(imageWidth/2));
+   var endPicX = startPicX + imageWidth;
+   var startPicY = relativePosition!=0?startY:((canvasHeight/2)-(imageHeight/2));
+   var endPicY = startPicY + imageHeight;
+   var borderWidth = 2;
 
-    if(aData!=null) {
-		  aData.x=startPicX;
-		  aData.y=startPicY;
-		  aData.width=imageWidth;
-		  aData.height=imageHeight;
-		  aData.image = img;
-    }
+   if(aData!=null) {
+     aData.x=startPicX;
+     aData.y=startPicY;
+     aData.width=imageWidth;
+     aData.height=imageHeight;
+     aData.image = img;
+   }
 
-    // draw rectangle to border image
-    context.save();
-    clipRoundedRegion(context,startPicX-borderWidth,startPicY-borderWidth,endPicX+(borderWidth),endPicY+(borderWidth))
-    context.fillStyle   = '#000000';
-    context.fillRect(startPicX-borderWidth,startPicY-borderWidth,imageWidth+(borderWidth*2),imageHeight+(borderWidth*2));
-    context.restore();
+   // draw rectangle to border image
+   context.save();
+   clipRoundedRegion(context,startPicX-borderWidth,startPicY-borderWidth,endPicX+(borderWidth),endPicY+(borderWidth))
+   context.fillStyle   = '#000000';
+   context.fillRect(startPicX-borderWidth,startPicY-borderWidth,imageWidth+(borderWidth*2),imageHeight+(borderWidth*2));
+   context.restore();
 
-    context.save();
-    clipRoundedRegion(context,startPicX,startPicY,endPicX,endPicY)
-    context.drawImage(img,startPicX,startPicY,imageWidth,imageHeight);
-    context.restore();
+   context.save();
+   clipRoundedRegion(context,startPicX,startPicY,endPicX,endPicY)
+   context.drawImage(img,startPicX,startPicY,imageWidth,imageHeight);
+   context.restore();
 
 }
 
 function clipRoundedRegion(context,startPicX,startPicY,endPicX,endPicY) {
-    var cornerRadius = 20;
+   var cornerRadius = 20;
 
-    context.beginPath();
-    context.moveTo(startPicX+cornerRadius, startPicY);
-    context.lineTo(endPicX-cornerRadius, startPicY); 
-    context.quadraticCurveTo(endPicX,startPicY,endPicX,startPicY+cornerRadius);
-    context.lineTo(endPicX,endPicY-cornerRadius);
-		context.quadraticCurveTo(endPicX,endPicY,endPicX-cornerRadius,endPicY);
-    context.lineTo(startPicX+cornerRadius,endPicY);
-		context.quadraticCurveTo(startPicX,endPicY,startPicX,endPicY-cornerRadius);
-    context.lineTo(startPicX,startPicY+cornerRadius);
-    context.quadraticCurveTo(startPicX,startPicY, startPicX+cornerRadius, startPicY);
-    context.clip();
+   context.beginPath();
+   context.moveTo(startPicX+cornerRadius, startPicY);
+   context.lineTo(endPicX-cornerRadius, startPicY); 
+   context.quadraticCurveTo(endPicX,startPicY,endPicX,startPicY+cornerRadius);
+   context.lineTo(endPicX,endPicY-cornerRadius);
+   context.quadraticCurveTo(endPicX,endPicY,endPicX-cornerRadius,endPicY);
+   context.lineTo(startPicX+cornerRadius,endPicY);
+   context.quadraticCurveTo(startPicX,endPicY,startPicX,endPicY-cornerRadius);
+   context.lineTo(startPicX,startPicY+cornerRadius);
+   context.quadraticCurveTo(startPicX,startPicY, startPicX+cornerRadius, startPicY);
+   context.clip();
 }
 
 function drawTextAsImage(canvas,context,aData,text,x,y,width,height) {
