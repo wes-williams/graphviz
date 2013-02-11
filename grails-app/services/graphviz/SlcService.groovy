@@ -9,7 +9,7 @@ import graphviz.oauth.OAuth20ServiceBearerAdapter
 
 class SlcService {
 
-  final String API_BASE_URL = 'https://api.sandbox.slcedu.org/api/rest/v1'
+  final String API_BASE_URL = 'https://api.sandbox.inbloom.org/api/rest/v1'
   final boolean DEBUG=false
     
   OauthService oauthService
