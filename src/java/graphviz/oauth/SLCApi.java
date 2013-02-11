@@ -8,12 +8,12 @@ import org.scribe.oauth.*;
 
 public class SLCApi extends DefaultApi20
 {
-  private static final String AUTHORIZATION_URL = "https://api.sandbox.slcedu.org/api/oauth/authorize?client_id=%s&Realm=SandboxIDP&response_type=code&redirect_uri=%s";
+  private static final String AUTHORIZATION_URL = "https://api.sandbox.inbloom.org/api/oauth/authorize?client_id=%s&Realm=SandboxIDP&response_type=code&redirect_uri=%s";
 
   @Override
   public String getAccessTokenEndpoint()
   {
-    return "https://api.sandbox.slcedu.org/api/oauth/token?grant_type=authorization_code";
+    return "https://api.sandbox.inbloom.org/api/oauth/token?grant_type=authorization_code";
   }
 
   @Override
