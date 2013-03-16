@@ -320,7 +320,13 @@ function showInformation(e) {
     loadData(crumbs[crumbs.length-1],0,0,0,crumbs[crumbs.length-1].currentPage);
   }
   else {
-    showInformationForData(findSelectableAtXY(clickXY));
+    var selectableAtXY = findSelectableAtXY(clickXY,true);
+    if(isClickWithinRefocusCircle(selectableAtXY,clickXY)) {
+      loadData(selectableAtXY,0,0,0,1,false,'#');
+    }
+    else {
+      showInformationForData(selectableAtXY);
+    }
   }
 }
 
@@ -339,7 +345,7 @@ function showLabel(e) {
   }
 }
 
-function findSelectableAtXY(clickXY) {
+function findSelectableAtXY(clickXY,includeCircle) {
 
   for(var i=0;i<selectables.length;i++) {
     if(clickXY.x >= selectables[i].x && 
@@ -348,6 +354,12 @@ function findSelectableAtXY(clickXY) {
       clickXY.y <= (selectables[i].y+selectables[i].height)) 
     {
       return selectables[i];
+    }
+
+    if(includeCircle==true) {
+      if(isClickWithinRefocusCircle(selectables[i],clickXY)) {
+        return selectables[i];
+      }
     }
   }
 
@@ -413,7 +425,6 @@ function showInformationForData(aData,ignoreTextLabel) {
 
     aData.loadedRelations=true;
   }
-
   doShowInformationForData(aData,ignoreTextLabel); 
 }
 
@@ -606,6 +617,85 @@ function drawTextInCircle(context,text,x,y) {
   context.textAlign='center';
   context.textBaseline = 'middle';
   context.fillText(text,x,y);
+}
+
+function isClickWithinRefocusCircle(aData,clickXY) {
+  if(aData==null) {
+    return false;
+  } 
+
+  var circleX=0, circleY=0;
+  switch(findQuadrant(aData.x,aData.y)) {
+    case 1:
+      circleX = aData.x;
+      circleY = aData.y;
+      break;
+    case 2:
+      circleX = aData.x+aData.width;
+      circleY = aData.y;
+      break;
+    case 3:
+      circleX = aData.x+aData.width;
+      circleY = aData.y+aData.height;
+      break;
+    case 4:
+      circleX = aData.x;
+      circleY = aData.y+aData.height;
+      break;
+  }
+
+  var circleRadius=15;
+
+  var innerX = circleX-circleRadius;
+  var outerX = circleX+circleRadius;
+  var upperY = circleY-circleRadius;
+  var lowerY = circleY+circleRadius;
+
+  if(clickXY.x >= innerX && clickXY.x <= outerX 
+     && clickXY.y >= upperY && clickXY.y <= lowerY) {
+    var color = colorAtXY(clickXY.x,clickXY.y);
+    return color !='000000';
+  }
+}
+
+function findQuadrant(x,y) {
+  var widthMiddle = graphCanvas.width/2;
+  var heightMiddle = graphCanvas.height/2;
+
+  if(widthMiddle>x) {
+    if(heightMiddle<y) {
+      return 4;
+    } else {
+      return 1; 
+    }
+  } else {
+    if(heightMiddle<y) {
+      return 3;
+    } else {
+      return 2;
+    }
+  }
+}
+
+function colorAtXY(x,y) {
+  var p = graphContext.getImageData(x,y, 1, 1);
+  var r = p.data[0];
+  var g = p.data[1];
+  var b = p.data[2];
+
+  if (r > 255 || g > 255 || b > 255) {
+    return undefined;
+  }
+
+  return d2Hex(r)+d2Hex(g)+d2Hex(b);
+}
+
+function d2Hex(d) {
+  var hex = Number(d).toString(16);
+  while (hex.length < 2) {
+    hex = "0" + hex;
+  }
+  return hex.toUpperCase();
 }
 
 function isClickOnNextButton(clickXY) {
